@@ -18,7 +18,7 @@ public class SpringConfigPaser {
 
     public static String getBeanPackage(String springConfig){
         SAXReader reader = new SAXReader();
-        InputStream inputStream = SpringConfigPaser.class.getClassLoader().getResourceAsStream(springConfig);
+        InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(springConfig);
         String text = "";
         try {
             Document document = reader.read(inputStream);
