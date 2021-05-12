@@ -2,6 +2,7 @@ package org.springframework.container;
 
 import org.springframework.annotation.Autowired;
 import org.springframework.annotation.Controller;
+import org.springframework.annotation.Repository;
 import org.springframework.annotation.Service;
 import org.springframework.xml.SpringConfigPaser;
 
@@ -58,7 +59,7 @@ public class ClassPathXmlApplicationContext {
         initInstances();
         System.out.println(iocNameContainer);
         //实现依赖注入
-
+        this.di();
     }
     //实现依赖注入
     private void di(){
@@ -91,6 +92,13 @@ public class ClassPathXmlApplicationContext {
                                         throw new RuntimeException("not find bean : " + type);
                                     }
                                 }
+                            }
+                            //反射注入对象
+                            declaredField.setAccessible(true);
+                            try {
+                                declaredField.set(iocClassContainer.get(aClass),bean);
+                            } catch (IllegalAccessException e) {
+                                e.printStackTrace();
                             }
 
                         }
@@ -130,7 +138,7 @@ public class ClassPathXmlApplicationContext {
          try {
              for(String classPath : classPaths){
                  Class<?> c = Class.forName(classPath);
-                 if(c.isAnnotationPresent(Controller.class) || c.isAnnotationPresent(Service.class)){
+                 if(c.isAnnotationPresent(Controller.class) || c.isAnnotationPresent(Service.class) ||c.isAnnotationPresent(Repository.class)){
                      //对象集合
                      Object o = c.newInstance();
                      iocClassContainer.put(c,o);
@@ -150,6 +158,7 @@ public class ClassPathXmlApplicationContext {
                      }
                      Controller controllerAnnotation = c.getAnnotation(Controller.class);
                      Service serviceAnnotation = c.getAnnotation(Service.class);
+                     Repository repositoryAnnotation = c.getAnnotation(Repository.class);
                      if(controllerAnnotation != null){
                          //获取注解value属性值
                          String value = controllerAnnotation.value();
@@ -158,6 +167,11 @@ public class ClassPathXmlApplicationContext {
                      if(serviceAnnotation != null){
                          //获取注解value属性值
                          String value = serviceAnnotation.value();
+                         addClass(c, value,o);
+                     }
+                     if(repositoryAnnotation != null){
+                         //获取注解value属性值
+                         String value = repositoryAnnotation.value();
                          addClass(c, value,o);
                      }
 

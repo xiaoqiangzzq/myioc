@@ -1,7 +1,9 @@
 package com.yj.service.Impl;
 
 import com.yj.bean.Order;
+import com.yj.dao.OrderDao;
 import com.yj.service.OrderService;
+import org.springframework.annotation.Autowired;
 import org.springframework.annotation.Service;
 
 import java.util.ArrayList;
@@ -16,13 +18,11 @@ import java.util.List;
  */
 @Service(value = "os1")
 public class OrderServiceImpl implements OrderService {
+
+    @Autowired
+    OrderDao orderDao;
     public List<Order> getOrders() {
-
-        List<Order> list = new ArrayList<Order>();
-
-        list.add(new Order(5,"water order",666));
-        list.add(new Order(6,"lv order",1245));
-
-        return list;
+        System.out.println("调用service。。。");
+        return orderDao.getOrders();
     }
 }

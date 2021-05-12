@@ -1,5 +1,7 @@
 package com.yj.test;
 
+import com.yj.bean.Order;
+import com.yj.controller.OrderController;
 import org.springframework.container.ClassPathXmlApplicationContext;
 
 /**
@@ -12,5 +14,7 @@ import org.springframework.container.ClassPathXmlApplicationContext;
 public class TestSpringIoc {
     public static void main(String[] args) {
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
+        OrderController bean = (OrderController)context.getBean(OrderController.class);
+        bean.getOrders();
     }
 }
