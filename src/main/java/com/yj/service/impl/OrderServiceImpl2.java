@@ -1,4 +1,4 @@
-package com.yj.service.Impl;
+package com.yj.service.impl;
 
 import com.yj.bean.Order;
 import com.yj.service.OrderService;
@@ -24,5 +24,11 @@ public class OrderServiceImpl2 implements OrderService {
         list.add(new Order(6,"lv order",1245));
 
         return list;
+    }
+
+    @Override
+    public int addOrder(Order order) {
+        System.out.println("新增订单。。。");
+        return 1;
     }
 }

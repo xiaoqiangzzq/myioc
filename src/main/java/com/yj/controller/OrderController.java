@@ -1,12 +1,10 @@
 package com.yj.controller;
 
 import com.yj.bean.Order;
-import com.yj.service.Impl.OrderServiceImpl;
 import com.yj.service.OrderService;
 import org.springframework.annotation.Autowired;
 import org.springframework.annotation.Controller;
 
-import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -16,10 +14,10 @@ import java.util.List;
  * @version V1.0 创建时间: 2021/5/8 15:08
  * Copyright 2021 by WiteMedia
  */
-@Controller
+@Controller(value = "oc")
 public class OrderController {
 
-    @Autowired(value = "os1")
+    @Autowired(value = "os")
     OrderService orderService;
 
     public String  getOrders(){
@@ -29,5 +27,10 @@ public class OrderController {
             System.out.println(order.getTitle());
         }
         return "调用成功";
+    }
+
+
+    public void add(){
+        orderService.addOrder(new Order(111,"杯子",62));
     }
 }

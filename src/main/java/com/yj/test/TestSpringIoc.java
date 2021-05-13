@@ -14,7 +14,9 @@ import org.springframework.container.ClassPathXmlApplicationContext;
 public class TestSpringIoc {
     public static void main(String[] args) {
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
-        OrderController bean = (OrderController)context.getBean(OrderController.class);
-        bean.getOrders();
+        //OrderController bean = (OrderController)context.getBean(OrderController.class);
+        OrderController bean = (OrderController)context.getBean("oc");
+        //bean.getOrders();
+        bean.add();
     }
 }

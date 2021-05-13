@@ -14,4 +14,6 @@ import java.util.List;
 public interface OrderService {
 
     List<Order> getOrders();
+
+    int addOrder(Order order);
 }

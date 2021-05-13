@@ -1,19 +1,24 @@
 package org.springframework.container;
 
+import org.springframework.annotation.Around;
+import org.springframework.annotation.Aspect;
 import org.springframework.annotation.Autowired;
 import org.springframework.annotation.Controller;
 import org.springframework.annotation.Repository;
 import org.springframework.annotation.Service;
+import org.springframework.proxy.JdkProxy;
 import org.springframework.xml.SpringConfigPaser;
 
 import java.io.File;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * 容器类
@@ -35,6 +40,10 @@ public class ClassPathXmlApplicationContext {
 
     //spring 的ioc容器 对象实现的接口作为key，接口的实现类作为value
     private Map<Class<?>,List<Object>> iocInterfaceContainer = new ConcurrentHashMap<Class<?>,List<Object>>();
+
+    //存储切面类集合
+    private Set<Class<?>> aopClassContainer = new CopyOnWriteArraySet<>();
+
 
     //路径下的class文件
     private List<String> classPaths = new ArrayList<String>();
@@ -58,9 +67,100 @@ public class ClassPathXmlApplicationContext {
         //类的实例化，扫描包下的class反射创建对象
         initInstances();
         System.out.println(iocNameContainer);
+
+        //执行Aop切面
+
+        try {
+            doAop();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
         //实现依赖注入
         this.di();
     }
+
+    //执行切面
+    private void doAop() throws ClassNotFoundException {
+        //循环集合
+        if(aopClassContainer.size() > 0){
+            for (Class<?> c : aopClassContainer) {
+                //获取切面类中的方法
+                Method[] declaredMethods = c.getDeclaredMethods();
+                if(declaredMethods != null){
+                    for (Method declaredMethod : declaredMethods) {
+                        boolean annotationPresent = declaredMethod.isAnnotationPresent(Around.class);
+                        if(Boolean.TRUE.equals(annotationPresent)){
+                            Around aroundAnnotation = declaredMethod.getAnnotation(Around.class);
+                            //切入的目标类方法
+                            String execution = aroundAnnotation.execution();
+                            //要代理的目标全名称
+                            String fullClass = execution.substring(0, execution.lastIndexOf("."));
+                            //代理的方法
+                            String methodName = execution.substring(execution.lastIndexOf(".") + 1);
+                            //要代理的类
+                            Class<?> targetClass = Class.forName(fullClass);
+                            //要被代理的类对象
+                            Object targetObject = iocClassContainer.get(targetClass);
+                            //targetObject 中的methodName 进行代理
+                            JdkProxy<Object> jdkProxy = new JdkProxy<>(targetClass,c,targetObject,methodName,
+                                    declaredMethod);
+                            //代理类的对象 com.sun.proxy.$Proxy6
+                            Object proxyInstance = jdkProxy.getProxyInstance();
+                            System.out.println(proxyInstance.getClass().getName());
+                            //把原始集合中的对象替换 为代理对象
+                            iocClassContainer.put(targetClass,proxyInstance);
+                            //2.替换iocNameContainer
+                            String simpleName = targetClass.getSimpleName();
+                            String className =
+                                    String.valueOf(simpleName.charAt(0)).toLowerCase() + simpleName.substring(1);
+                            Service service = targetClass.getAnnotation(Service.class);
+                            Controller controller = targetClass.getAnnotation(Controller.class);
+                            Repository repository = targetClass.getAnnotation(Repository.class);
+                            if(service!= null){
+                                String value = service.value();
+                                if(!value.isEmpty()){
+                                    className = value;
+                                }
+                            }
+                            if(controller!= null){
+                                String value = controller.value();
+                                if(!value.isEmpty()){
+                                    className = value;
+                                }
+                            }
+                            if(repository!= null){
+                                String value = repository.value();
+                                if(!value.isEmpty()){
+                                    className = value;
+                                }
+                            }
+                            iocNameContainer.put(className,proxyInstance);
+                            //3.替换接口集合
+                            Class<?>[] interfaces = targetClass.getInterfaces();
+                            if(interfaces!= null ){
+                                for (Class<?> anInterface : interfaces) {
+                                    List<Object> objects = iocInterfaceContainer.get(anInterface);
+                                    if(objects!=null){
+                                        for (int i = 0; i < objects.size(); i++) {
+                                            Object o = objects.get(i);
+                                            if(o.getClass()==targetClass){
+                                                objects.set(i,proxyInstance);
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
     //实现依赖注入
     private void di(){
         Set<Class<?>> classes = iocClassContainer.keySet();
@@ -98,6 +198,7 @@ public class ClassPathXmlApplicationContext {
                             try {
                                 declaredField.set(iocClassContainer.get(aClass),bean);
                             } catch (IllegalAccessException e) {
+                                System.out.println("error....");
                                 e.printStackTrace();
                             }
 
@@ -138,6 +239,13 @@ public class ClassPathXmlApplicationContext {
          try {
              for(String classPath : classPaths){
                  Class<?> c = Class.forName(classPath);
+
+                 //定义那些实现了aspect
+                 if(c.isAnnotationPresent(Aspect.class)){
+                     //将切面类存储到集合中
+                     aopClassContainer.add(c);
+                     continue;
+                 }
                  if(c.isAnnotationPresent(Controller.class) || c.isAnnotationPresent(Service.class) ||c.isAnnotationPresent(Repository.class)){
                      //对象集合
                      Object o = c.newInstance();
