@@ -106,6 +106,7 @@ public class ClassPathXmlApplicationContext {
                             JdkProxy<Object> jdkProxy = new JdkProxy<>(targetClass,c,targetObject,methodName,
                                     declaredMethod);
                             //代理类的对象 com.sun.proxy.$Proxy6
+                            //问题：如果遇到无法注入的问题，考虑代理先di(),在后期循环di（）注入的时候，排除代理
                             Object proxyInstance = jdkProxy.getProxyInstance();
                             System.out.println(proxyInstance.getClass().getName());
                             //把原始集合中的对象替换 为代理对象
