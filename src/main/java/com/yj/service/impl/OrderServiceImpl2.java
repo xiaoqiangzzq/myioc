@@ -14,7 +14,7 @@ import java.util.List;
  * @version V1.0 创建时间: 2021/5/8 15:05
  * Copyright 2021 by WiteMedia
  */
-@Service(value = "os")
+@Service(value = "os1")
 public class OrderServiceImpl2 implements OrderService {
     public List<Order> getOrders() {
 
@@ -29,6 +29,11 @@ public class OrderServiceImpl2 implements OrderService {
     @Override
     public int addOrder(Order order) {
         System.out.println("新增订单。。。");
+        return 1;
+    }
+
+    @Override
+    public int transferMoney(String fromName, String toName, double money) {
         return 1;
     }
 }

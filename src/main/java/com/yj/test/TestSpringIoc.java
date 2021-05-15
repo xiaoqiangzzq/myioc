@@ -17,6 +17,7 @@ public class TestSpringIoc {
         //OrderController bean = (OrderController)context.getBean(OrderController.class);
         OrderController bean = (OrderController)context.getBean("oc");
         //bean.getOrders();
-        bean.add();
+        //bean.add();
+        bean.transferMoney();
     }
 }

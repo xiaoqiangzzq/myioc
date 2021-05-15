@@ -16,4 +16,6 @@ public interface OrderService {
     List<Order> getOrders();
 
     int addOrder(Order order);
+
+    int transferMoney(String fromName,String toName,double money);
 }

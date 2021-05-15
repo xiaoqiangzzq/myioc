@@ -3,7 +3,12 @@ package com.yj.dao.impl;
 import com.yj.bean.Order;
 import com.yj.dao.OrderDao;
 import org.springframework.annotation.Repository;
+import org.springframework.tx.TransactionManager;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,4 +32,21 @@ public class OrderDaoImpl implements OrderDao {
 
         return list;
     }
+
+    @Override
+    public int excuteMoney(String name,double money) throws ClassNotFoundException, SQLException {
+//        Class<?> aClass = Class.forName("com.mysql.cj.jdbc.Driver");
+//        Connection connection = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/account?serverTimezone=UTC&characterEncoding=UTF-8","root","123456");
+        Connection connection = TransactionManager.getThreadConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement("update t_account set money= money + ? where name = ?");
+        preparedStatement.setObject(1,money);
+        preparedStatement.setObject(2,name);
+        int i = preparedStatement.executeUpdate();
+        //connection.close();
+        return i;
+    }
+
+//    public static void main(String[] args) throws SQLException, ClassNotFoundException {
+//        new OrderDaoImpl().excuteMoney("666",3000);
+//    }
 }

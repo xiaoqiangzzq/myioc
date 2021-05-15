@@ -2,6 +2,7 @@ package com.yj.dao;
 
 import com.yj.bean.Order;
 
+import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -13,4 +14,6 @@ import java.util.List;
  */
 public interface OrderDao {
     List<Order> getOrders();
+
+    int excuteMoney(String name,double money) throws ClassNotFoundException, SQLException;
 }

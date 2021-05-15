@@ -33,4 +33,9 @@ public class OrderController {
     public void add(){
         orderService.addOrder(new Order(111,"杯子",62));
     }
+
+
+    public void transferMoney(){
+        orderService.transferMoney("666","777",2000);
+    };
 }

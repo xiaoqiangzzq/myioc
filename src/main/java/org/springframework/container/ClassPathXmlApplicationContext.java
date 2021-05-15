@@ -1,11 +1,7 @@
 package org.springframework.container;
 
-import org.springframework.annotation.Around;
-import org.springframework.annotation.Aspect;
-import org.springframework.annotation.Autowired;
-import org.springframework.annotation.Controller;
-import org.springframework.annotation.Repository;
-import org.springframework.annotation.Service;
+import org.springframework.annotation.*;
+import org.springframework.proxy.CglibProxy;
 import org.springframework.proxy.JdkProxy;
 import org.springframework.xml.SpringConfigPaser;
 
@@ -250,6 +246,24 @@ public class ClassPathXmlApplicationContext {
                  if(c.isAnnotationPresent(Controller.class) || c.isAnnotationPresent(Service.class) ||c.isAnnotationPresent(Repository.class)){
                      //对象集合
                      Object o = c.newInstance();
+                     //判断是否有transactional修饰，支持事务
+                     Method[] declaredMethods = c.getDeclaredMethods();
+                     //存储事务方法名称
+                     List<String> transactionList = new ArrayList<>();
+                     if(null != declaredMethods){
+                         for (Method declaredMethod : declaredMethods) {
+                             boolean annotationPresent = declaredMethod.isAnnotationPresent(Transactional.class);
+                             if(Boolean.TRUE.equals(annotationPresent)){
+                                 transactionList.add(declaredMethod.getName());
+                             }
+                         }
+
+                         if(transactionList.size() > 0){
+                             //为类中的方法添加事务
+                             CglibProxy cglibProxy = new CglibProxy(c, transactionList);
+                             o = cglibProxy.getProxyInstance();
+                         }
+                     }
                      iocClassContainer.put(c,o);
                      //接口对象集合
                      Class<?>[] interfaces = c.getInterfaces();
