@@ -25,6 +25,8 @@ import java.util.concurrent.CopyOnWriteArraySet;
  */
 public class ClassPathXmlApplicationContext {
 
+    private static ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext();
+
     //applicationContext
     private String springConfig;
 
@@ -40,10 +42,20 @@ public class ClassPathXmlApplicationContext {
     //存储切面类集合
     private Set<Class<?>> aopClassContainer = new CopyOnWriteArraySet<>();
 
+    //controller集合
+    private Map<Class<?>,Object> controllerClassContainer = new ConcurrentHashMap<Class<?>, Object>();
 
     //路径下的class文件
     private List<String> classPaths = new ArrayList<String>();
-    public ClassPathXmlApplicationContext(String springConfig){
+    private ClassPathXmlApplicationContext(){
+    }
+
+    public static ClassPathXmlApplicationContext getInstance(){
+        return context;
+    }
+
+    //启动类
+    public void bootStrap(String springConfig){
         this.springConfig = springConfig;
         init();
     }
@@ -74,6 +86,7 @@ public class ClassPathXmlApplicationContext {
 
         //实现依赖注入
         this.di();
+        System.out.println("controll 控制器对象："+ controllerClassContainer);
     }
 
     //执行切面
@@ -283,6 +296,8 @@ public class ClassPathXmlApplicationContext {
                      Service serviceAnnotation = c.getAnnotation(Service.class);
                      Repository repositoryAnnotation = c.getAnnotation(Repository.class);
                      if(controllerAnnotation != null){
+                         //存储控制器对象
+                         controllerClassContainer.put(c,o);
                          //获取注解value属性值
                          String value = controllerAnnotation.value();
                          addClass(c, value,o);
