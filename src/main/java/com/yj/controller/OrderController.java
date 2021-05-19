@@ -4,6 +4,8 @@ import com.yj.bean.Order;
 import com.yj.service.OrderService;
 import org.springframework.annotation.Autowired;
 import org.springframework.annotation.Controller;
+import org.springframework.mvc.annotation.RequestBody;
+import org.springframework.mvc.annotation.RequestMapping;
 
 import java.util.List;
 
@@ -15,11 +17,14 @@ import java.util.List;
  * Copyright 2021 by WiteMedia
  */
 @Controller(value = "oc")
+@RequestMapping("/order")
 public class OrderController {
 
     @Autowired(value = "os")
     OrderService orderService;
 
+    @RequestBody
+    @RequestMapping(value = "/getOrders")
     public String  getOrders(){
         System.out.println("调用Controller。。。。");
         List<Order> orders = orderService.getOrders();

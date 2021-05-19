@@ -2,5 +2,9 @@
 
 <beans>
 
+    <!-- 静态资源放行-->
+    <resources mapping = "/images/**" location = "/images/"></resources>
+    <resources mapping = "/js/**" location = "/js/"></resources>
+    <resources mapping = "/css/**" location = "/css/"></resources>
 
 </beans>
