@@ -7,6 +7,7 @@ import org.springframework.annotation.Controller;
 import org.springframework.mvc.annotation.RequestBody;
 import org.springframework.mvc.annotation.RequestMapping;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -34,6 +35,15 @@ public class OrderController {
         return "调用成功";
     }
 
+
+    @RequestMapping("/list")
+    public String list(HttpServletRequest httpServletRequest){
+
+        httpServletRequest.setAttribute("name","zzq");
+        //默认转发存储值
+        return "show";         //跳转到show.jsp /WEB-INF/jsp/show.jsp
+
+    }
 
     public void add(){
         orderService.addOrder(new Order(111,"杯子",62));

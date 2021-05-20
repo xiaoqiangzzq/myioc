@@ -1,6 +1,7 @@
 package org.springframework.mvc.servlet;
 
 
+import org.springframework.container.ClassPathXmlApplicationContext;
 import org.springframework.mvc.processer.ControllerProcess;
 import org.springframework.mvc.processer.EncodingProcess;
 import org.springframework.mvc.processer.ExecuteProcess;
@@ -15,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 //SpringMVC 核心控制器
 public class DisPatcherServlet extends HttpServlet {
@@ -34,10 +36,15 @@ public class DisPatcherServlet extends HttpServlet {
         String contextConfigLocation = this.getServletConfig().getInitParameter("contextConfigLocation");
         System.out.println("springmvc的配置文件：" + contextConfigLocation);
 
+
+        ClassPathXmlApplicationContext instance = ClassPathXmlApplicationContext.getInstance();
+        //控制器集合
+        Map<Class<?>, Object> controllerClassContainer = instance.getControllerClassContainer();
+
         processerChainList.add(new EncodingProcess());
         processerChainList.add(new StaticResourceProcess(contextConfigLocation.split(":")[1]));
         processerChainList.add(new JspResourceProcess());
-        processerChainList.add(new ControllerProcess());
+        processerChainList.add(new ControllerProcess(controllerClassContainer));
     }
 
     /**

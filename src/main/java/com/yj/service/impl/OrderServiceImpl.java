@@ -1,10 +1,11 @@
 package com.yj.service.impl;
 
 import com.yj.bean.Order;
+import com.yj.dao.OrderDao;
 import com.yj.service.OrderService;
+import org.springframework.annotation.Autowired;
 import org.springframework.annotation.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -14,26 +15,23 @@ import java.util.List;
  * @version V1.0 创建时间: 2021/5/8 15:05
  * Copyright 2021 by WiteMedia
  */
-@Service(value = "os")
-public class OrderServiceImpl2 implements OrderService {
+@Service(value = "os1")
+public class OrderServiceImpl implements OrderService {
+
+    @Autowired
+    OrderDao orderDao;
     public List<Order> getOrders() {
-
-        List<Order> list = new ArrayList<Order>();
-
-        list.add(new Order(5,"water order",666.2));
-        list.add(new Order(6,"lv order",1245));
-
-        return list;
+        System.out.println("调用service。。。");
+        return orderDao.getOrders();
     }
 
     @Override
     public int addOrder(Order order) {
-        System.out.println("新增订单。。。");
-        return 1;
+        return 0;
     }
 
     @Override
     public int transferMoney(String fromName, String toName, double money) {
-        return 1;
+        return 0;
     }
 }

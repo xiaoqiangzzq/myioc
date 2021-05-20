@@ -52,6 +52,6 @@ public class StaticResourceProcess implements ProcesserChain {
                 }
             }
         }
-        return false;
+        return true;
     }
 }

@@ -382,4 +382,7 @@ public class ClassPathXmlApplicationContext {
         return path;
     }
 
+    public Map<Class<?>, Object> getControllerClassContainer() {
+        return controllerClassContainer;
+    }
 }
