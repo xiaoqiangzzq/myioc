@@ -13,21 +13,21 @@ import java.lang.reflect.Method;
  */
 public class HandlerMapping {
 
-    private RequestPath requestPath;
+    private Object controllerObject ;//控制对象
 
-    private Method method;
+    private Method method;//控制请求的方法
 
-    public HandlerMapping(RequestPath requestPath, Method method) {
-        this.requestPath = requestPath;
+    public HandlerMapping(Object controllerObject, Method method) {
+        this.controllerObject = controllerObject;
         this.method = method;
     }
 
-    public RequestPath getRequestPath() {
-        return requestPath;
+    public Object getControllerObject() {
+        return controllerObject;
     }
 
-    public void setRequestPath(RequestPath requestPath) {
-        this.requestPath = requestPath;
+    public void setControllerObject(Object controllerObject) {
+        this.controllerObject = controllerObject;
     }
 
     public Method getMethod() {

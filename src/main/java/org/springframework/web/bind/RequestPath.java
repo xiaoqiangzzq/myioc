@@ -1,5 +1,7 @@
 package org.springframework.web.bind;
 
+import java.util.Objects;
+
 /**
  * 类说明
  *
@@ -32,5 +34,19 @@ public class RequestPath {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof RequestPath)) return false;
+        RequestPath that = (RequestPath) o;
+        return Objects.equals(getUrl(), that.getUrl()) &&
+                Objects.equals(getType(), that.getType());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getUrl(), getType());
     }
 }

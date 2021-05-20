@@ -1,13 +1,16 @@
 package org.springframework.mvc.processer;
 
 import org.springframework.mvc.annotation.RequestMapping;
+import org.springframework.mvc.servlet.HandleAdapter;
 import org.springframework.mvc.servlet.HandlerMapping;
 import org.springframework.web.bind.RequestMehtod;
 import org.springframework.web.bind.RequestPath;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -20,7 +23,10 @@ import java.util.Set;
  */
 public class ControllerProcess implements ProcesserChain {
 
-    private Map<Class<?>, Object> controllerClassContainer;
+    public Map<Class<?>, Object> controllerClassContainer;
+
+    //请求地址 请求对象方法
+    public Map<RequestPath,HandlerMapping> mappingMap = new HashMap<>();
 
     public ControllerProcess(Map<Class<?>, Object> controllerClassContainer) {
         this.controllerClassContainer = controllerClassContainer;
@@ -59,11 +65,34 @@ public class ControllerProcess implements ProcesserChain {
                         //解析方法的请求方式
                         RequestMehtod requestMethod = requestMapping.method();
                         RequestPath requestPath = new RequestPath(ulr.toString(),requestMethod.name());
-
-                        HandlerMapping handlerMapping = new HandlerMapping(requestPath,method);
+                        //请求对象
+                        HandlerMapping handlerMapping = new HandlerMapping(o,method);
+                        mappingMap.put(requestPath,handlerMapping);
                     }
                 }
             }
+        }
+        //处理请求
+        String requestURI = httpServletRequest.getRequestURI();
+        String method = httpServletRequest.getMethod();
+        RequestPath requestPath = new RequestPath(requestURI,method);
+        HandlerMapping handlerMapping = mappingMap.get(requestPath);
+        if(handlerMapping != null){
+
+            //映射请求处理
+            System.out.println("映射到用户请求：" + requestURI);
+            HandleAdapter handleAdapter = new HandleAdapter(handlerMapping,httpServletRequest,httpServletResponse);
+            handleAdapter.handle();
+
+
+
+        }else {
+            try {
+                httpServletResponse.sendError(HttpServletResponse.SC_NOT_FOUND,"not find your request");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            System.out.println("用户请求的地址404");
         }
 
         return false;
