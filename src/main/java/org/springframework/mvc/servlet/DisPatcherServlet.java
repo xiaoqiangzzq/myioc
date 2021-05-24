@@ -41,6 +41,8 @@ public class DisPatcherServlet extends HttpServlet {
         //控制器集合
         Map<Class<?>, Object> controllerClassContainer = instance.getControllerClassContainer();
 
+        System.out.println("传入：" + controllerClassContainer);
+
         processerChainList.add(new EncodingProcess());
         processerChainList.add(new StaticResourceProcess(contextConfigLocation.split(":")[1]));
         processerChainList.add(new JspResourceProcess());

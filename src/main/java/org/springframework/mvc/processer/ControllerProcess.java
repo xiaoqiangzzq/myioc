@@ -36,13 +36,15 @@ public class ControllerProcess implements ProcesserChain {
     public boolean process(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
 
         if(controllerClassContainer.size() > 0){
+
+            System.out.println("当前：" + controllerClassContainer);
             Set<Map.Entry<Class<?>, Object>> entries = controllerClassContainer.entrySet();
 
             for (Map.Entry<Class<?>, Object> entry : entries) {
                 //控制器类
                 Class<?> c = entry.getKey();
                 //控制器对象
-                Object o = entry.getValue();
+                Object oc = entry.getValue();
                 boolean b = c.isAnnotationPresent(RequestMapping.class);
                 Method[] methods = c.getDeclaredMethods();
                 for (Method method : methods) {
@@ -66,7 +68,7 @@ public class ControllerProcess implements ProcesserChain {
                         RequestMehtod requestMethod = requestMapping.method();
                         RequestPath requestPath = new RequestPath(ulr.toString(),requestMethod.name());
                         //请求对象
-                        HandlerMapping handlerMapping = new HandlerMapping(o,method);
+                        HandlerMapping handlerMapping = new HandlerMapping(oc,method);
                         mappingMap.put(requestPath,handlerMapping);
                     }
                 }
@@ -82,10 +84,16 @@ public class ControllerProcess implements ProcesserChain {
             //映射请求处理
             System.out.println("映射到用户请求：" + requestURI);
             HandleAdapter handleAdapter = new HandleAdapter(handlerMapping,httpServletRequest,httpServletResponse);
-            handleAdapter.handle();
-
-
-
+            try {
+                handleAdapter.handle();
+            } catch (Exception e) {
+                try {
+                    httpServletResponse.sendError(500,"server inner error");
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+                e.printStackTrace();
+            }
         }else {
             try {
                 httpServletResponse.sendError(HttpServletResponse.SC_NOT_FOUND,"not find your request");

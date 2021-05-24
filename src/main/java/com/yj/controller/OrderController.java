@@ -6,8 +6,11 @@ import org.springframework.annotation.Autowired;
 import org.springframework.annotation.Controller;
 import org.springframework.mvc.annotation.RequestBody;
 import org.springframework.mvc.annotation.RequestMapping;
+import org.springframework.mvc.annotation.RequestParam;
+import org.springframework.web.bind.RequestMehtod;
 
 import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.Method;
 import java.util.List;
 
 /**
@@ -21,7 +24,7 @@ import java.util.List;
 @RequestMapping("/order")
 public class OrderController {
 
-    @Autowired(value = "os")
+    @Autowired(value = "os1")
     OrderService orderService;
 
     @RequestBody
@@ -36,10 +39,10 @@ public class OrderController {
     }
 
 
-    @RequestMapping("/list")
-    public String list(HttpServletRequest httpServletRequest){
+    @RequestMapping(value = "/list",method = RequestMehtod.GET)
+    public String list(int age ,@RequestParam(name = "uname") String name){
 
-        httpServletRequest.setAttribute("name","zzq");
+        //httpServletRequest.setAttribute("name","zzq");
         //默认转发存储值
         return "show";         //跳转到show.jsp /WEB-INF/jsp/show.jsp
 

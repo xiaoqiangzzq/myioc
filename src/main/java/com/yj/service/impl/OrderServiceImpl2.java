@@ -14,7 +14,7 @@ import java.util.List;
  * @version V1.0 创建时间: 2021/5/8 15:05
  * Copyright 2021 by WiteMedia
  */
-@Service(value = "os")
+//@Service(value = "os")
 public class OrderServiceImpl2 implements OrderService {
     public List<Order> getOrders() {
 

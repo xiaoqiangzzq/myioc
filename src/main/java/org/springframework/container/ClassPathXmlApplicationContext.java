@@ -259,6 +259,9 @@ public class ClassPathXmlApplicationContext {
                  if(c.isAnnotationPresent(Controller.class) || c.isAnnotationPresent(Service.class) ||c.isAnnotationPresent(Repository.class)){
                      //对象集合
                      Object o = c.newInstance();
+                     if(c.isAnnotationPresent(Controller.class)){
+                         controllerClassContainer.put(c,o);
+                     }
                      //判断是否有transactional修饰，支持事务
                      Method[] declaredMethods = c.getDeclaredMethods();
                      //存储事务方法名称
@@ -297,7 +300,7 @@ public class ClassPathXmlApplicationContext {
                      Repository repositoryAnnotation = c.getAnnotation(Repository.class);
                      if(controllerAnnotation != null){
                          //存储控制器对象
-                         controllerClassContainer.put(c,o);
+                         //controllerClassContainer.put(c,o);
                          //获取注解value属性值
                          String value = controllerAnnotation.value();
                          addClass(c, value,o);
