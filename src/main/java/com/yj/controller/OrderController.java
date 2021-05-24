@@ -29,21 +29,23 @@ public class OrderController {
 
     @RequestBody
     @RequestMapping(value = "/getOrders")
-    public String  getOrders(){
+    public List<Order>  getOrders(){
         System.out.println("调用Controller。。。。");
         List<Order> orders = orderService.getOrders();
         for (Order order : orders) {
             System.out.println(order.getTitle());
         }
-        return "调用成功";
+        return orders;
     }
 
 
     @RequestMapping(value = "/list",method = RequestMehtod.GET)
-    public String list(int age ,@RequestParam(name = "uname") String name){
+    public String list(int age ,@RequestParam(name = "uname") String name,String hobbys){
 
         //httpServletRequest.setAttribute("name","zzq");
         //默认转发存储值
+        //request.setAttribute("msg","我是控制器");
+
         return "show";         //跳转到show.jsp /WEB-INF/jsp/show.jsp
 
     }

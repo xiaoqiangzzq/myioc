@@ -12,6 +12,6 @@
 </head>
 <body>
 
-<h1> 这是一个jsp页面</h1>
+<h1> 这是一个jsp页面 : ${msg}</h1>
 </body>
 </html>

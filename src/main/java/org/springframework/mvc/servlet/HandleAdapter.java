@@ -1,9 +1,13 @@
 package org.springframework.mvc.servlet;
 
+import com.google.gson.Gson;
+import org.springframework.mvc.annotation.RequestBody;
 import org.springframework.mvc.annotation.RequestParam;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -41,10 +45,43 @@ public class HandleAdapter {
         Method method = handlerMapping.getMethod();
         Object controllerObject = handlerMapping.getControllerObject();
         getMethodParameterInfo(method);
+        //暂时未考虑参数为一个对象
         Object[] args = getArgs();
         //反射调用控制器方法
         Object invoke = method.invoke(controllerObject, args);
-        System.out.println(invoke);
+        System.out.println("控制器方法的返回值："+invoke);
+        boolean annotationPresent = method.isAnnotationPresent(RequestBody.class);
+        if(annotationPresent){
+            //返回json数据格式
+            responseJson(invoke);
+        }else if(invoke instanceof String){
+            //返回是字符串，调整json视图
+            responseJsp(invoke);
+        }else {
+            System.out.println("控制方法没有返回值.");
+        }
+    }
+
+    private void responseJsp(Object result){
+        try {
+            //转发路径因该从springmvc配置文件读取
+            httpServletRequest.getRequestDispatcher("/WEB-INF/jsp/" + result + ".jsp").forward(httpServletRequest,httpServletResponse);
+        } catch (ServletException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void responseJson(Object result){
+        Gson gson = new Gson();
+        String s = gson.toJson(result);
+        httpServletResponse.setContentType("application/json;charset=utf-8");
+        try {
+            httpServletResponse.getWriter().write(s);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
